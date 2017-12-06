@@ -56,10 +56,10 @@ public class DataToAudio {
   }
 
   public void update() {
-    //for (int i = 0; i < numOutputs; ++i) {
-    //  oscP5.send(new OscMessage("/Speakers"+i+"/Up").add(speakers.get(i).getPitch()).add(speakers.get(i).getVolume()), puredata);
-    //  oscP5.send(new OscMessage("/Speakers"+i+"/Down").add(speakers.get(i+numOutputs).getPitch()).add(speakers.get(i+numOutputs).getVolume()), puredata);
-    //}
+    for (int i = 0; i < NUM_OUTPUTS; ++i) {
+      oscP5.send((new OscMessage("/Speakers/"+i).add(speakers.get(i).getPitch())).add(speakers.get(i).getVolume()), puredata);
+      oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(speakers.get(i+NUM_OUTPUTS).getVolume()), puredata);
+    }
   }
 
   public void output(float[] pitchLevels, float[][] volumeLevels) {
