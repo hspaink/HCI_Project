@@ -1,0 +1,3 @@
+static enum Toggles {
+  START
+}
