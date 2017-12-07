@@ -14,7 +14,7 @@ float pointSpawnX;
 float oldPitch;
 
 void setup() {
-  fullScreen();
+  size(800,600);
   frameRate(FRAME_RATE);
 
   dataToAudio = new DataToAudio();
