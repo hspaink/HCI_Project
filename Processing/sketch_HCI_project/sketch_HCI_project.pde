@@ -1,4 +1,4 @@
-final static int NUM_OUTPUTS = 1; // Front, Middle, Back
+final static int NUM_OUTPUTS = 3; // Front, Middle, Back
 final static int FRAME_RATE = 60;
 final static int UPDATE_FREQ = 1000; // Give new value every 1000ms
 final static float LEFT_MARGIN = 0;
