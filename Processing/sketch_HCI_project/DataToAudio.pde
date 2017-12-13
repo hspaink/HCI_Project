@@ -2,37 +2,6 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-//class DataToAudio {
-//  private boolean end = false;
-
-//  private float[] values = new float[2];
-
-
-//  DataToAudio() {
-//    values[1] = 0;
-//  }
-
-//  public void addValue(float value) {
-//    values[0] = values[1];
-//    values[1] = value;
-//  }
-
-//  public float getValue() {
-//    return values[1];
-//  }
-
-//  public float getOldValue() {
-//    return values[0];
-//  }
-
-//  public void end() {
-//    end = true;
-//  }
-
-//  public void go() {
-//    end = false;
-//  }
-//}
 
 public class DataToAudio {
   private List<Speaker> speakers = new ArrayList();
@@ -52,7 +21,7 @@ public class DataToAudio {
 
   public void init() {
     oscP5 = new OscP5(this, 12000);
-    puredata = new NetAddress("127.0.0.1", 9001);
+    puredata = new NetAddress("127.0.0.1", 9000);
   }
 
   public void update() {
@@ -60,6 +29,7 @@ public class DataToAudio {
       oscP5.send((new OscMessage("/Speakers/"+i).add(speakers.get(i).getPitch())).add(speakers.get(i).getVolume()), puredata);
       oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(speakers.get(i+NUM_OUTPUTS).getVolume()), puredata);
     }
+    System.out.println(speakers.get(0).getVolume());
   }
 
   public void output(float[] pitchLevels, float[][] volumeLevels) {
