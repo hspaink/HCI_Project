@@ -26,12 +26,13 @@ public class DataToAudio {
 
   public void output() {
     for (int i = 0; i < NUM_OUTPUTS; ++i) {
-      oscP5.send((new OscMessage("/Speakers/"+i).add(speakers.get(i).getPitch())).add(speakers.get(i).getVolume()), puredata);
-      oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(speakers.get(i+NUM_OUTPUTS).getVolume()), puredata);
+      oscP5.send((new OscMessage("/Speakers/"+i).add(speakers.get(i).getPitch())).add(min(speakers.get(i).getVolume(), 0.7)), puredata);
+      oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(min(speakers.get(i+NUM_OUTPUTS).getVolume(), 0.7)), puredata);
     }
   }
 
   public void update(int speakerIndex, float pitchLevel, float[] volumeLevels) {    
+    System.out.println(speakerIndex);
     for (Speaker speaker : speakers) {
       speaker.setVolume(0);
       speaker.setPitch(0);
@@ -46,9 +47,17 @@ public class DataToAudio {
     System.out.println("----------------------");
     for (int i = 0; i < NUM_OUTPUTS; ++i) {
       System.out.println("Speaker " + i);
-      System.out.println("Pitch: " + speakers.get(i).getPitch());
+      System.out.println("Pitch: " + (speakers.get(i).getPitch() - 100));
       System.out.println("Volume: " + speakers.get(i).getVolume());
     }
+  }
+
+  public void silence() {
+    System.out.println("Silence");
+    for (int i = 0; i < NUM_OUTPUTS; ++i) {
+      oscP5.send((new OscMessage("/Speakers/"+i).add(0)).add(0), puredata);
+      oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(0)).add(0), puredata);
+    }    
   }
 
   public void togglePaused() {

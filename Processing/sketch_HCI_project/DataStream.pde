@@ -5,7 +5,6 @@ public class DataStream {
   // To get block of data every second
   private myTimerTask getDataTimerTask;
   private myTimerTask outputStreamTimerTask;
-  private myTimerTask iterateOutput;
 
   private int speakerIndex;
 
@@ -29,8 +28,7 @@ public class DataStream {
   public DataStream(DataToAudio dataToAudio) {
     // Init variables
     getDataTimerTask = new myTimerTask(this, "getData", 1);
-    outputStreamTimerTask = new myTimerTask(this, "outputStream", UPDATE_FREQ);
-    iterateOutput = new myTimerTask(this, "changeOutput", UPDATE_FREQ/NUM_OUTPUTS);
+    outputStreamTimerTask = new myTimerTask(this, "changeOutput", UPDATE_FREQ);
     this.dataToAudio = dataToAudio;
     fileReader = new myFileReader();
     streamHighest = 0;
@@ -38,6 +36,7 @@ public class DataStream {
     currentPrice = 0;
     volumeLevels[0] = 0;
     volumeLevels[1] = 0;
+    speakerIndex = 0;
 
     initStream();
   }
@@ -49,17 +48,22 @@ public class DataStream {
     System.out.println("Starting stream...");
     getDataTimerTask.start();
     outputStreamTimerTask.start();
-    iterateOutput.start();
   }
 
   public void togglePaused() {
     paused = !paused;
     STATE = !paused?"Streaming":"Paused";
+
+    dataToAudio.silence();
   }
 
   public void changeOutput() {
-    dataToAudio.update(speakerIndex, pitchLevel, volumeLevels);
-    speakerIndex = (speakerIndex + 1) % NUM_OUTPUTS;
+    if (!paused) {
+      dataToAudio.update(speakerIndex, pitchLevel, volumeLevels);
+      speakerIndex = (speakerIndex + 1) % NUM_OUTPUTS;
+      if (speakerIndex == 0)
+        outputStream();
+    }
   }
 
   public void outputStream() {
@@ -69,8 +73,8 @@ public class DataStream {
       JSONObject object;
       if ((object = dataBuffer.poll()) == null) {
         outputStreamTimerTask.endTimerTask();
-        iterateOutput.endTimerTask();
         STATE = "End";
+        dataToAudio.silence();
         return;
       }
       // Update pitch
@@ -88,7 +92,7 @@ public class DataStream {
         volumeLevels[0] = tradeVolume * (newHeight-streamLowest)/(streamHighest-streamLowest);
         volumeLevels[1] = tradeVolume * (1 - (newHeight-streamLowest)/(streamHighest-streamLowest));
       } else 
-      volumeLevels[0] = volumeLevels[1] = 2000;
+        volumeLevels[0] = volumeLevels[1] = 2000;
     }
   }
 
