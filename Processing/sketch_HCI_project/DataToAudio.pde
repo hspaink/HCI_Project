@@ -24,29 +24,37 @@ public class DataToAudio {
     puredata = new NetAddress("127.0.0.1", 9000);
   }
 
-  public void update() {
+  public void output() {
     for (int i = 0; i < NUM_OUTPUTS; ++i) {
       oscP5.send((new OscMessage("/Speakers/"+i).add(speakers.get(i).getPitch())).add(speakers.get(i).getVolume()), puredata);
       oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(speakers.get(i+NUM_OUTPUTS).getVolume()), puredata);
     }
-    System.out.println(speakers.get(0).getVolume());
-    
-    
   }
 
-  public void output(int speakerSet, float pitchLevel, float[] volumeLevels) {
-    for (int i = 0; i < NUM_OUTPUTS; ++i) 
-      speakers.get(i).setPitch(pitchLevels[i]);
-      speakers.get(i+NUM_OUTPUTS).setPitch(pitchLevels[i]);
-      speakers.get(i).setVolume(volumeLevels[i][0]);
-      speakers.get(i+NUM_OUTPUTS).setVolume(volumeLevels[i][1]);
+  public void update(int speakerIndex, float pitchLevel, float[] volumeLevels) {    
+    for (Speaker speaker : speakers) {
+      speaker.setVolume(0);
+      speaker.setPitch(0);
+    }
+    speakers.get(speakerIndex).setPitch(pitchLevel);
+    speakers.get(speakerIndex).setVolume(volumeLevels[0]);
+    speakers.get(speakerIndex+NUM_OUTPUTS).setPitch(pitchLevel);
+    speakers.get(speakerIndex+NUM_OUTPUTS).setVolume(volumeLevels[1]);
+    
+    
+    
+    System.out.println("----------------------");
+    for (int i = 0; i < NUM_OUTPUTS; ++i) {
+      System.out.println("Speaker " + i);
+      System.out.println("Pitch: " + speakers.get(i).getPitch());
+      System.out.println("Volume: " + speakers.get(i).getVolume());
     }
   }
 
   public void togglePaused() {
     dataStream.togglePaused();
   }
-  
+
   public float getSpeakerOnePitch() {
     return speakers.get(0).getPitch();
   }

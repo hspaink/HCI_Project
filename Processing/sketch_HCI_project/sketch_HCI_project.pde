@@ -29,7 +29,7 @@ void setup() {
 
 void draw() {
   if (STATE != "End")
-    dataToAudio.update();
+    dataToAudio.output();
   background(-1);
 
   toggles.get(Toggles.START).display();
@@ -40,7 +40,7 @@ void draw() {
   if (STATE != "Paused" && STATE != "End") {
     float pitch = dataToAudio.getSpeakerOnePitch();
     counter = (counter-1 == FRAME_RATE*UPDATE_FREQ/1000) ? 1 : counter+1;
-    System.out.println(pitch);
+    //System.out.println(pitch);
     //System.out.println(((pitch-oldPitch)*counter/(FRAME_RATE*UPDATE_FREQ/1000)+oldPitch-2000)*10);
     points.add(new GraphPoint(pointSpawnX, ((pitch-oldPitch)*counter/(FRAME_RATE*UPDATE_FREQ/1000)+oldPitch)*0.01-height));
     if (counter == 1)

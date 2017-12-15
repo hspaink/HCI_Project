@@ -5,6 +5,9 @@ public class DataStream {
   // To get block of data every second
   private myTimerTask getDataTimerTask;
   private myTimerTask outputStreamTimerTask;
+  private myTimerTask iterateOutput;
+
+  private int speakerIndex;
 
   private boolean paused = true;
 
@@ -19,41 +22,44 @@ public class DataStream {
   private float currentPrice;
 
   // Speakers: {front, middle, back} [{top, bottom}]
-  private float[] pitchLevels = new float[NUM_OUTPUTS];
-  private float[][] volumeLevels = new float[NUM_OUTPUTS][2];
+  private float pitchLevel = 0;
+  private float[] volumeLevels = new float[2];
 
 
   public DataStream(DataToAudio dataToAudio) {
     // Init variables
     getDataTimerTask = new myTimerTask(this, "getData", 1);
     outputStreamTimerTask = new myTimerTask(this, "outputStream", UPDATE_FREQ);
+    iterateOutput = new myTimerTask(this, "changeOutput", UPDATE_FREQ/NUM_OUTPUTS);
     this.dataToAudio = dataToAudio;
     fileReader = new myFileReader();
     streamHighest = 0;
     streamLowest = Float.MAX_VALUE;
     currentPrice = 0;
-    for (float pitchLevel : pitchLevels)
-      pitchLevel = 0;
-    for (float[] volumeLevel : volumeLevels) {
-      volumeLevel[0] = 0;
-      volumeLevel[1] = 0;
-    }
+    volumeLevels[0] = 0;
+    volumeLevels[1] = 0;
 
     initStream();
   }
 
   private void initStream() {
-    // TODO setup real data stream
+    // TODO: setup real data stream
 
     // Temporary solution:
     System.out.println("Starting stream...");
     getDataTimerTask.start();
-    outputStreamTimerTask.start();    
+    outputStreamTimerTask.start();
+    iterateOutput.start();
   }
 
   public void togglePaused() {
     paused = !paused;
     STATE = !paused?"Streaming":"Paused";
+  }
+
+  public void changeOutput() {
+    dataToAudio.update(speakerIndex, pitchLevel, volumeLevels);
+    speakerIndex = (speakerIndex + 1) % NUM_OUTPUTS;
   }
 
   public void outputStream() {
@@ -63,6 +69,7 @@ public class DataStream {
       JSONObject object;
       if ((object = dataBuffer.poll()) == null) {
         outputStreamTimerTask.endTimerTask();
+        iterateOutput.endTimerTask();
         STATE = "End";
         return;
       }
@@ -76,23 +83,15 @@ public class DataStream {
       streamHighest = max(streamHighest, newHeight);
       streamLowest = min(streamLowest, newHeight);
       // Set levels
-      for (int i = NUM_OUTPUTS-1; i > 0; --i) {
-        pitchLevels[i] = pitchLevels[i-1];
-        volumeLevels[i][0] = volumeLevels[i-1][0];
-        volumeLevels[i][1] = volumeLevels[i-1][1];
-      }
-      pitchLevels[0] = newPitch;
+      pitchLevel = newPitch;
       if (streamHighest-streamLowest != 0) {
-        volumeLevels[0][0] = tradeVolume * (newHeight-streamLowest)/(streamHighest-streamLowest);
-        volumeLevels[0][1] = tradeVolume * (1 - (newHeight-streamLowest)/(streamHighest-streamLowest));
-      }
-      else 
-        volumeLevels[0][0] = volumeLevels[0][1] = 2000;
-
-      for (int i = 0; i < 
+        volumeLevels[0] = tradeVolume * (newHeight-streamLowest)/(streamHighest-streamLowest);
+        volumeLevels[1] = tradeVolume * (1 - (newHeight-streamLowest)/(streamHighest-streamLowest));
+      } else 
+      volumeLevels[0] = volumeLevels[1] = 2000;
     }
   }
-  
+
   //Temporary solution:
   public void getData() {
     if (!fileReader.done()) {
@@ -103,5 +102,4 @@ public class DataStream {
       getDataTimerTask.endTimerTask();
     }
   }
-  
 }
