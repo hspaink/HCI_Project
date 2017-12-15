@@ -25,7 +25,7 @@ public class DataStream {
 
   public DataStream(DataToAudio dataToAudio) {
     // Init variables
-    getDataTimerTask = new myTimerTask(this, "getData", UPDATE_FREQ);
+    getDataTimerTask = new myTimerTask(this, "getData", 1);
     outputStreamTimerTask = new myTimerTask(this, "outputStream", UPDATE_FREQ);
     this.dataToAudio = dataToAudio;
     fileReader = new myFileReader();
@@ -89,7 +89,7 @@ public class DataStream {
       else 
         volumeLevels[0][0] = volumeLevels[0][1] = 2000;
 
-      dataToAudio.output(pitchLevels, volumeLevels);
+      for (int i = 0; i < 
     }
   }
   

@@ -30,20 +30,17 @@ public class DataToAudio {
       oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(speakers.get(i+NUM_OUTPUTS).getVolume()), puredata);
     }
     System.out.println(speakers.get(0).getVolume());
+    
+    
   }
 
-  public void output(float[] pitchLevels, float[][] volumeLevels) {
-    for (int i = 0; i < NUM_OUTPUTS; ++i) {
-      //System.out.println("Speakerset "+(i+1)+":");
-      //System.out.println("  pitch   :"+pitchLevels[i]);
-      //System.out.println("  vol up  :"+volumeLevels[i][0]);
-      //System.out.println("  vol down:"+volumeLevels[i][1]);
+  public void output(int speakerSet, float pitchLevel, float[] volumeLevels) {
+    for (int i = 0; i < NUM_OUTPUTS; ++i) 
       speakers.get(i).setPitch(pitchLevels[i]);
       speakers.get(i+NUM_OUTPUTS).setPitch(pitchLevels[i]);
       speakers.get(i).setVolume(volumeLevels[i][0]);
       speakers.get(i+NUM_OUTPUTS).setVolume(volumeLevels[i][1]);
     }
-    //System.out.println("----------------------------");
   }
 
   public void togglePaused() {
