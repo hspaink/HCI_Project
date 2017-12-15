@@ -1,6 +1,6 @@
 final static int NUM_OUTPUTS = 3; // Front, Middle, Back
 final static int FRAME_RATE = 60;
-final static int UPDATE_FREQ = 100; // Give new value every 1000ms
+final static int UPDATE_FREQ = 300; // Give new value every 1000ms
 final static float LEFT_MARGIN = 0;
 static String STATE = "End";
 

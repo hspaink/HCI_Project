@@ -11,7 +11,7 @@ public class Speaker {
   }
   
   public float getPitch() {
-    return (pitch*100000+10000)/100;
+    return (pitch*1000000+20000)/100;
   }
   
   public void setVolume(float volume) {
@@ -19,6 +19,6 @@ public class Speaker {
   }
   
   public float getVolume() {
-    return volume/200000;
+    return volume/400000;
   }
 }
