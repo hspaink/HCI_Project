@@ -26,8 +26,9 @@ public class DataToAudio {
 
   public void output() {
     for (int i = 0; i < NUM_OUTPUTS; ++i) {
-      oscP5.send((new OscMessage("/Speakers/"+i).add(speakers.get(i).getPitch())).add(min(speakers.get(i).getVolume(), 0.5)), puredata);
-      oscP5.send((new OscMessage("/Speakers/"+(i+NUM_OUTPUTS)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(min(speakers.get(i+NUM_OUTPUTS).getVolume(), 0.5)), puredata);
+      
+      oscP5.send((new OscMessage("/Speakers/"+i*2).add(speakers.get(i).getPitch())).add(min(speakers.get(i).getVolume(), 0.5)), puredata);
+      oscP5.send((new OscMessage("/Speakers/"+(i*2+1)).add(speakers.get(i+NUM_OUTPUTS).getPitch())).add(min(speakers.get(i+NUM_OUTPUTS).getVolume(), 0.5)), puredata);
     }
   }
 
@@ -64,7 +65,7 @@ public class DataToAudio {
     dataStream.togglePaused();
   }
 
-  public float getSpeakerOnePitch() {
-    return speakers.get(0).getPitch();
+  public float getGraphHeight() {
+    return dataStream.getGraphHeight();
   }
 }

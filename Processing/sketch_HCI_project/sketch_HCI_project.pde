@@ -11,10 +11,11 @@ ArrayList<GraphPoint> points;
 float counter;
 EnumMap<Toggles, Toggle> toggles = new EnumMap<Toggles, Toggle>(Toggles.class);
 float pointSpawnX;
-float oldPitch;
+float graphHeight; // Y-pos of the data at current time
+float oldHeight; // Old data height
 
 void setup() {
-  size(800,600);
+  size(800, 600);
   frameRate(FRAME_RATE);
 
   dataToAudio = new DataToAudio();
@@ -22,12 +23,14 @@ void setup() {
   counter = 0;
   // Create Pause button
   toggles.put(Toggles.START, new Toggle(100, 100, 0, (float)width-200, (float)height/2, "START / STOP"));
-  
+
   pointSpawnX = width/2;
-  oldPitch = 0;
+  graphHeight = 0;
+  oldHeight = 0;
 }
 
 void draw() {
+
   if (STATE != "End")
     dataToAudio.output();
   background(-1);
@@ -38,22 +41,23 @@ void draw() {
   stroke(0);
   beginShape();
   if (STATE != "Paused" && STATE != "End") {
-    float pitch = dataToAudio.getSpeakerOnePitch();
-    counter = (counter-1 == FRAME_RATE*UPDATE_FREQ/1000) ? 1 : counter+1;
-    //System.out.println(pitch);
-    //System.out.println(((pitch-oldPitch)*counter/(FRAME_RATE*UPDATE_FREQ/1000)+oldPitch-2000)*10);
-    points.add(new GraphPoint(pointSpawnX, ((pitch-oldPitch)*counter/(FRAME_RATE*UPDATE_FREQ/1000)+oldPitch)*0.01-height));
-    if (counter == 1)
-      oldPitch = pitch;
-  } 
-  else
-    points.add(new GraphPoint(pointSpawnX, height/2));  
-  for (int i = 0; i < points.size(); ++i) {
-    --points.get(i).x;
+    counter = (counter == 3*FRAME_RATE*UPDATE_FREQ/1000) ? 0 : counter+1;
+    if (counter == 0) {
+      oldHeight = graphHeight;
+      graphHeight = dataToAudio.getGraphHeight();
+    }
+    points.add(new GraphPoint(pointSpawnX, (0.5*(graphHeight-oldHeight)*(cos(counter*PI/(3*FRAME_RATE*UPDATE_FREQ/1000))-1)-oldHeight)*(height*0.4)+(height*0.5)));
+
+    for (int i = 0; i < points.size(); ++i) {
+      --points.get(i).x;
+      vertex(points.get(i).x, points.get(i).y);
+      if (points.get(i).x < LEFT_MARGIN)
+        points.remove(i);
+    }
+  } else 
+  for (int i = 0; i < points.size(); ++i)
     vertex(points.get(i).x, points.get(i).y);
-    if (points.get(i).x < LEFT_MARGIN)
-      points.remove(i);
-  }
+
   endShape();
 
 
@@ -74,13 +78,13 @@ class GraphPoint {
 
 void keyPressed() {
   switch(key) {
-    case ' ':
-      dataToAudio.togglePaused();
-      break;
-    case 'q':
-    case 'Q':
-      exit();
-      break;
+  case ' ':
+    dataToAudio.togglePaused();
+    break;
+  case 'q':
+  case 'Q':
+    exit();
+    break;
   }
 }
 

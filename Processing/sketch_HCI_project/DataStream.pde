@@ -3,48 +3,37 @@ import java.lang.reflect.Method;
 
 public class DataStream {
   // To get block of data every second
-  private myTimerTask getDataTimerTask;
-  private myTimerTask outputStreamTimerTask;
+  private myTimerTask getDataTimerTask = new myTimerTask(this, "getData", 1);
+  private myTimerTask outputStreamTimerTask = new myTimerTask(this, "changeOutput", UPDATE_FREQ);
 
-  private int speakerIndex;
+  private int speakerIndex = 0;
 
   private boolean paused = true;
 
   private DataToAudio dataToAudio = null;
-  private myFileReader fileReader = null;
+  private myFileReader fileReader = new myFileReader();;
 
   // Data storage + values
   private Queue<JSONObject> dataBuffer = new ArrayDeque<JSONObject>(); // Queue datastructure because of fifo properties
-  private float streamHighest;
-  private float streamLowest;
+  private float streamHighest = 0;
+  private float streamLowest = Float.MAX_VALUE;
+  private float graphHeight = 0.5;
 
-  private float currentPrice;
+  private float currentPrice = 0;
 
   // Speakers: {front, middle, back} [{top, bottom}]
   private float pitchLevel = 0;
-  private float[] volumeLevels = new float[2];
+  private float[] volumeLevels = {0, 0};
 
 
   public DataStream(DataToAudio dataToAudio) {
-    // Init variables
-    getDataTimerTask = new myTimerTask(this, "getData", 1);
-    outputStreamTimerTask = new myTimerTask(this, "changeOutput", UPDATE_FREQ);
     this.dataToAudio = dataToAudio;
-    fileReader = new myFileReader();
-    streamHighest = 0;
-    streamLowest = Float.MAX_VALUE;
-    currentPrice = 0;
-    volumeLevels[0] = 0;
-    volumeLevels[1] = 0;
-    speakerIndex = 0;
-
     initStream();
   }
 
   private void initStream() {
     // TODO: setup real data stream
 
-    // Temporary solution:
     System.out.println("Starting stream...");
     getDataTimerTask.start();
     outputStreamTimerTask.start();
@@ -89,8 +78,10 @@ public class DataStream {
       // Set levels
       pitchLevel = newPitch;
       if (streamHighest-streamLowest != 0) {
-        volumeLevels[0] = tradeVolume * (newHeight-streamLowest)/(streamHighest-streamLowest);
-        volumeLevels[1] = tradeVolume * (1 - (newHeight-streamLowest)/(streamHighest-streamLowest));
+        graphHeight = (newHeight-streamLowest)/(streamHighest-streamLowest);
+        //System.out.println(graphHeight + " " + tradeVolume);
+        volumeLevels[0] = tradeVolume * graphHeight;
+        volumeLevels[1] = tradeVolume * (1.0 - graphHeight);
       } else 
         volumeLevels[0] = volumeLevels[1] = 2000;
     }
@@ -105,5 +96,9 @@ public class DataStream {
       System.out.println("End of stream...");
       getDataTimerTask.endTimerTask();
     }
+  }
+  
+  public float getGraphHeight() {
+    return graphHeight;
   }
 }
