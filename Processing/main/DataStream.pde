@@ -72,7 +72,7 @@ public class DataStream {
       currentPrice = newPrice;
       // Update volume
       float tradeVolume = Float.parseFloat(object.getString("5. volume"));
-      float newHeight = (Float.parseFloat(object.getString("2. high"))+Float.parseFloat(object.getString("3. low")))/2; // Difference in price high : low
+      float newHeight = newPrice;//(Float.parseFloat(object.getString("2. high"))+Float.parseFloat(object.getString("3. low")))/2; // Difference in price high : low
       streamHighest = max(streamHighest, newHeight);
       streamLowest = min(streamLowest, newHeight);
       // Set levels

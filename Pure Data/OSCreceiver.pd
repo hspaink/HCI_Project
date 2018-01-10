@@ -1,4 +1,4 @@
-#N canvas 0 23 1280 646 10;
+#N canvas 114 226 1280 646 10;
 #X declare -lib mrpeach;
 #X obj 38 23 import mrpeach;
 #X obj 82 104 unpackOSC;
@@ -9,7 +9,7 @@
 #X obj 195 246 unpack f f;
 #X obj 194 320 osc~;
 #X obj 656 141 dac~ 1 2 3 4 5 6 7 8 9 10;
-#X obj 36 195 routeOSC /0 /1 /2 /3 /4 /5;
+#X obj 164 183 routeOSC /0 /1 /2 /3 /4 /5;
 #X text 110 498 5 = Front Top 6 = Front Bottom 7 = Middle Top 8 = Middle
 Bottom 9 = Back Bottom 10 = Back Top;
 #X msg 739 -168 open 02-hans_zimmer-on_thin_ice.wav;
@@ -66,6 +66,7 @@ Bottom 9 = Back Bottom 10 = Back Top;
 #X connect 9 1 6 0;
 #X connect 9 2 13 0;
 #X connect 9 3 17 0;
+#X connect 9 4 20 0;
 #X connect 9 5 23 0;
 #X connect 11 0 12 0;
 #X connect 12 0 29 0;
